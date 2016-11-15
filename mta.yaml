@@ -17,8 +17,24 @@ modules:
    path: web
    requires:
       - name: bianix_uaa
-        properties: 
-        TARGET_CONTAINER: ~{hdi-container-name}
+      - name: js-service
+        group: destinations
+        properties:
+          name: core-backend
+          url: ~{url}
+          forwardAuthToken: true
+
+ - name: js
+   type: nodejs
+   path: js
+   provides:
+    - name: js-service
+      properties:
+        url: "${default-url}"
+   requires:
+   - name: bianix_uaa
+   - name: bp-container
+   - name: db
 
 resources:
  - name: bianix_uaa
