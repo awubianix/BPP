@@ -7,10 +7,28 @@ modules:
    type: hdb
    path: db
    requires:
-    - name: hdi-container
+   - name: bp-container
+     properties: 
+        TARGET_CONTAINER: ~{bp-container-name}
+
+
+ - name: web
+   type: html5
+   path: web
+   requires:
+      - name: bianix_uaa
+        properties: 
+        TARGET_CONTAINER: ~{hdi-container-name}
 
 resources:
- - name: hdi-container
+ - name: bianix_uaa
+   type: com.sap.xs.uaa
+   parameters:
+      config_path: ./xs-security.json
+ - name: bp-container
    properties:
-      hdi-container-name: ${service-name}
+      bp-container-name: ${service-name}
    type: com.sap.xs.hdi-container
+   parameters:
+      config:
+       schema: BIANIX_BP

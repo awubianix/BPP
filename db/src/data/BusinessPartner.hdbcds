@@ -1,0 +1,111 @@
+context BusinessPartner {
+
+    type BusinessKey : String(10);
+    type Guid : String(32);
+    type PartnerRole: String(10);
+	type SDate : LocalDate;
+	type StatusT: String(1);
+	type RelationShipType: String(6);
+    type LocationId: Integer;
+	
+ 	Type HistoryT {
+          createdBy : BusinessKey;
+          createdAt : SDate;
+          changedBy : BusinessKey;
+          changedAt : SDate; 
+        };
+        
+ 	Type ValidityT {
+          validFrom : SDate;
+          validTo : SDate; 
+        };
+
+    Entity User {
+    	key uuid: Guid;
+        key  systemUserId: BusinessKey;
+        partnerNum: BusinessKey;
+        firstName: String(40);
+        lastName: String(40);
+        validity: ValidityT;
+        locked: Boolean;
+        deleted: Boolean;
+        history: HistoryT;
+      	partner: Association[1] to BupaMain on partner.partnerNum = partnerNum; 
+      } technical configuration {
+          column store;
+      };
+      
+    Entity BupaMain {
+    	key uuid: Guid;
+        key  partnerNum: BusinessKey;
+        partnerKind:String(10);
+        deleted: Boolean;
+        firstName: String(40);
+        lastName: String(40);
+        history: HistoryT;
+      } technical configuration {
+          column store;
+      };
+
+    Entity BupaRel {
+    	key uuid: Guid;
+        key  partnerNum: BusinessKey;
+        key  relatedPartner: BusinessKey;
+        key  relationshipType:RelationShipType;
+      	partner1: Association[1] to BupaMain on partner1.partnerNum = partnerNum; 
+      	partner2: Association[1] to BupaMain on partner2.partnerNum = relatedPartner; 
+      	validity: ValidityT;
+      } technical configuration {
+          column store;
+      };
+
+    Entity BupaRole {
+    	key uuid: Guid;
+        key  partnerNum: BusinessKey;
+        key  partnerRole:PartnerRole;
+      	partner: Association[1] to BupaMain on partner.partnerNum = partnerNum; 
+      	validity: ValidityT;
+      } technical configuration {
+          column store;
+      };
+
+    Entity BupaComm {
+    	key uuid: Guid;
+        key  partnerNum: BusinessKey;
+        communicationType:Integer;
+        emailAddress:String(100);
+        locationId:LocationId;
+        telephone:String(100);
+        url: String(1000);
+      	validity: ValidityT;
+      	partner: Association[1] to BupaMain on partner.partnerNum = partnerNum; 
+      	location: Association[1] to Location on location.locationId = locationId; 
+      } technical configuration {
+          column store;
+      };
+
+    Entity BupaLocation {
+    	key uuid: Guid;
+        key  partnerNum: BusinessKey;
+        locationId:LocationId;
+      	partner: Association[1] to BupaMain on partner.partnerNum = partnerNum; 
+      	location: Association[1] to Location on location.locationId = locationId; 
+      } technical configuration {
+          column store;
+      };
+
+    Entity Location {
+    	key uuid: Guid;
+        locationId:LocationId;
+		point:String(100);
+		address1: String(100);
+		address2: String(100);
+		city: String(100);
+		postalCode: String(30);
+		region: String(100);
+		country: String(100);
+      } technical configuration {
+          column store;
+      };
+      
+};  
